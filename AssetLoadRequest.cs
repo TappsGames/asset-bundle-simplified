@@ -16,7 +16,8 @@ namespace AssetBundleSimplified
             }
         }
 
-        private bool isAssetLoaded;
+        public bool isAssetLoaded { get; private set; }
+
         private event Action<T> OnCompleteCallback;
 
         public event Action<T> OnComplete
@@ -82,6 +83,11 @@ namespace AssetBundleSimplified
                 var isLoaded = IsLoaded();
                 return !isLoaded;
             }
+        }
+
+        public AssetLoadRequestAwaiter<T> GetAwaiter()
+        {
+            return new AssetLoadRequestAwaiter<T>(this);
         }
 
         private void LoadAssets(AsyncOperation operation)

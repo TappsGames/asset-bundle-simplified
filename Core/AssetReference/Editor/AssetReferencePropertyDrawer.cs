@@ -11,10 +11,17 @@ namespace AssetBundleSimplified.AssetReference.Editor
     {
         private Object asset;
 
-        private int propertyHeight = 1;
+        private float propertyHeight = 0f;
+        private float padding = 3f;
         
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {            
+            EditorGUI.BeginProperty(position, label, property);
+            
+            position = EditorGUI.PrefixLabel(position,
+                GUIUtility.GetControlID(FocusType.Passive),
+                label);
+            
             var assetNameProperty = property.FindPropertyRelative("AssetName");
             var bundleNameProperty = property.FindPropertyRelative("BundleName");
 
@@ -33,36 +40,37 @@ namespace AssetBundleSimplified.AssetReference.Editor
                 previousAsset = asset;
             }
 
+            propertyHeight = padding;
+
             Rect objPosition = position;
-            objPosition.height = 0.5f;
-            asset = EditorGUI.ObjectField(position, property.name, previousAsset, assetType, false);
+            objPosition.y += propertyHeight;
+            objPosition.height = 16.0f;
+            asset = EditorGUI.ObjectField(objPosition, previousAsset, assetType, false);
+            propertyHeight += objPosition.height;
 
             string assetPath = string.Empty;
             string bundleName = string.Empty;
 
-            if (previousAsset != asset)
-            {                
-                if (asset != null)
-                {
-                    assetPath = AssetDatabase.GetAssetPath(asset);
-                    bundleName = AssetDatabase.GetImplicitAssetBundleName(assetPath);
-                }
-                
-                assetNameProperty.stringValue = asset != null ? asset.name : string.Empty;
-                bundleNameProperty.stringValue = asset != null ? bundleName : string.Empty;
-            }
-
-            if (!string.IsNullOrEmpty(bundleName))
+                           
+            if (asset != null)
             {
-                propertyHeight = 1;
+                assetPath = AssetDatabase.GetAssetPath(asset);
+                bundleName = AssetDatabase.GetImplicitAssetBundleName(assetPath);
+            }
+            
+            assetNameProperty.stringValue = asset != null ? asset.name : string.Empty;
+            bundleNameProperty.stringValue = asset != null ? bundleName : string.Empty;
+
+            if (!string.IsNullOrEmpty(bundleName) && !string.IsNullOrEmpty(assetPath))
+            {
                 return;
             }
 
-            propertyHeight = 2;
-
             var messagePosition = position;
-            messagePosition.y = -16.0f;
-            messagePosition.height = 0.5f;
+            messagePosition.y = position.y + propertyHeight;
+            messagePosition.height = 32.0f;
+
+            propertyHeight += messagePosition.height;
                         
             if (asset == null)
             {
@@ -75,6 +83,8 @@ namespace AssetBundleSimplified.AssetReference.Editor
                 EditorGUI.HelpBox(messagePosition, "The selected asset is not on a asset bundle, this reference will not work!",
                     MessageType.Error);
             }
+            
+            EditorGUI.EndProperty();
         }
 
         private static Object LoadAsset(SerializedProperty assetNameProperty, SerializedProperty bundleNameProperty,
@@ -89,7 +99,7 @@ namespace AssetBundleSimplified.AssetReference.Editor
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return base.GetPropertyHeight(property, label) * propertyHeight;
+            return propertyHeight + padding;
         }
     }
 }

@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 namespace AssetBundleSimplified.AssetReference
 {
     //HACK: Generic classes are not serializable by Unity
-    [System.Serializable]
+    [Serializable]
     public abstract class AssetReference
     {
     }

@@ -126,6 +126,11 @@ namespace AssetBundleSimplified
             return debugInterface;
         }
 
+        public void SetRemoteProvider(IRemoteBundleProvider remoteBundleProvider)
+        {
+            throw new System.NotImplementedException();
+        }
+
         /// <summary>
         /// Load an asset bundle and its dependencies
         /// </summary>

@@ -17,5 +17,7 @@ namespace AssetBundleSimplified
         SceneLoadRequest LoadScene(string bundleName, string sceneName, LoadSceneMode loadSceneMode);
         AsyncOperation UnloadScene(string bundleName, string sceneName);
         IDebugInterface GetDebugInterface();
+
+        void SetRemoteProvider(IRemoteBundleProvider remoteBundleProvider);
     }
 }

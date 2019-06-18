@@ -16,6 +16,6 @@ namespace AssetBundleSimplified
         /// </summary>
         /// <param name="bundleName"></param>
         /// <returns></returns>
-        UnityWebRequest DownloadBundle(string bundleName);
+        IBundleDownloadRequest DownloadBundle(string bundleName);
     }
 }

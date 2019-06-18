@@ -15,6 +15,8 @@ namespace AssetBundleSimplified
         private AssetBundle manifestBundle;
         private Dictionary<string, AssetBundleCreateRequest> currentAsyncBundleLoadOperations;
 
+        private IRemoteBundleProvider remoteProvider;
+
         public BundleResourcesProvider()
         {
             Init();
@@ -163,6 +165,12 @@ namespace AssetBundleSimplified
             {
                 return new BundleLoadRequest(loadedBundle);
             }
+
+            if (remoteProvider != null && remoteProvider.IsRemoteBundle(bundleName))
+            {
+                var downloadRequest = remoteProvider.DownloadBundle(bundleName);
+                return new BundleLoadRequest(downloadRequest);
+            };
             
             var request = LoadBundleFromFileAsync(bundleName, false);
             var dependencies = LoadBundleDependenciesAsync(bundleName);

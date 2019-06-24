@@ -130,7 +130,7 @@ namespace AssetBundleSimplified
 
         public void SetRemoteProvider(IRemoteBundleProvider remoteBundleProvider)
         {
-            throw new System.NotImplementedException();
+            remoteProvider = remoteBundleProvider;
         }
 
         /// <summary>

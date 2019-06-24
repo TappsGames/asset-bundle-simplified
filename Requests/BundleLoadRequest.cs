@@ -61,10 +61,20 @@ namespace AssetBundleSimplified
 
         public BundleLoadRequest(IBundleDownloadRequest downloadRequest)
         {
+            dependenciesQueue = new Queue<AsyncOperation>();
+            
             downloadRequest.Completed += () =>
             {
                 isMainBundleLoaded = true;
                 Bundle = downloadRequest.Bundle;
+                
+                if (IsLoaded())
+                {
+                    if (onCompleteCallback != null)
+                    {
+                        onCompleteCallback.Invoke(Bundle);
+                    }
+                }
             };            
         }
 

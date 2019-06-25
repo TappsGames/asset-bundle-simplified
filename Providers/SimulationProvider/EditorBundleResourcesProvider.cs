@@ -108,7 +108,6 @@ namespace AssetBundleSimplified
 
         public void SetRemoteProvider(IRemoteBundleProvider remoteBundleProvider)
         {
-            throw new NotImplementedException();
         }
     }
 }

@@ -1,7 +1,7 @@
 {
   "name": "com.tappsgames.asset-bundle-simplified",
   "displayName": "Asset Bundle Simplified",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "unity": "2018.3",
   "description": "A package to simplify the usage of Asset Bundles.",
   "keywords": [ "AssetBundles", "Asset Management" ],

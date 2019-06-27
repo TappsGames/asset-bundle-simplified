@@ -70,7 +70,11 @@ namespace AssetBundleSimplified
             return provider.GetDebugInterface();
         }
 
-        
+        public static void SetRemoteProvider(IRemoteBundleProvider remoteBundleProvider)
+        {
+            provider.SetRemoteProvider(remoteBundleProvider);
+        }
+
         private static IBundleResourcesProvider GetProvider()
         {
 #if UNITY_EDITOR

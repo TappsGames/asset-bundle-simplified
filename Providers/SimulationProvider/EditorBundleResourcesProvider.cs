@@ -110,6 +110,10 @@ namespace AssetBundleSimplified
         {
             return new EditorDebugInterface();
         }
+
+        public void SetRemoteProvider(IRemoteBundleProvider remoteBundleProvider)
+        {
+        }
     }
 }
 #endif

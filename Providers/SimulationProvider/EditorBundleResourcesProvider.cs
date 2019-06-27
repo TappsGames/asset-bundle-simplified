@@ -13,7 +13,11 @@ namespace AssetBundleSimplified
 
     public class EditorBundleResourcesProvider : IBundleResourcesProvider
     {
+        
+#if !UNITY_2017
         public LoadSceneParameters SceneLoadParams = new LoadSceneParameters();
+#endif
+        
         
         public void UnloadAll()
         {
@@ -88,16 +92,12 @@ namespace AssetBundleSimplified
             var scene = Array.Find(paths, s => s.Contains(sceneName + ".unity"));
 
             AsyncOperation asyncOperation;
-            if (loadSceneMode == LoadSceneMode.Single)
-            {
-                SceneLoadParams.loadSceneMode = LoadSceneMode.Single;
-                asyncOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(scene, SceneLoadParams);
-            }
-            else
-            {
-                SceneLoadParams.loadSceneMode = LoadSceneMode.Additive;
-                asyncOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(scene, SceneLoadParams);
-            }
+#if UNITY_2017
+            asyncOperation = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
+#else
+            SceneLoadParams.loadSceneMode = LoadSceneMode.Single;
+            asyncOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(scene, SceneLoadParams);
+#endif
             return new SceneLoadRequest(asyncOperation);
         }
 

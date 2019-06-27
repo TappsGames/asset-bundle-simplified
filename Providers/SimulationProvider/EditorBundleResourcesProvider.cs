@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -12,6 +13,8 @@ namespace AssetBundleSimplified
 
     public class EditorBundleResourcesProvider : IBundleResourcesProvider
     {
+        public LoadSceneParameters SceneLoadParams = new LoadSceneParameters();
+        
         public void UnloadAll()
         {
         }
@@ -87,11 +90,13 @@ namespace AssetBundleSimplified
             AsyncOperation asyncOperation;
             if (loadSceneMode == LoadSceneMode.Single)
             {
-                asyncOperation = EditorApplication.LoadLevelAsyncInPlayMode(scene);
+                SceneLoadParams.loadSceneMode = LoadSceneMode.Single;
+                asyncOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(scene, SceneLoadParams);
             }
             else
             {
-                asyncOperation = EditorApplication.LoadLevelAdditiveAsyncInPlayMode(scene);
+                SceneLoadParams.loadSceneMode = LoadSceneMode.Additive;
+                asyncOperation = EditorSceneManager.LoadSceneAsyncInPlayMode(scene, SceneLoadParams);
             }
             return new SceneLoadRequest(asyncOperation);
         }

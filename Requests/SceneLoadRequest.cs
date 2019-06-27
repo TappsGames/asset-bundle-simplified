@@ -10,7 +10,7 @@ namespace AssetBundleSimplified
         {
             add
             {
-                if (isDone)
+                if (asyncOperation.isDone)
                 {
                     value();
                     return;
@@ -24,42 +24,39 @@ namespace AssetBundleSimplified
             }
         }
         private Action onComplete;
-        
-        private bool isDone;
+        private AsyncOperation asyncOperation;
 
         public SceneLoadRequest(BundleLoadRequest bundleLoadRequest, string sceneName, LoadSceneMode loadSceneMode)
         {
             bundleLoadRequest.OnComplete += assetBundle =>
             {
-                var sceneRequest = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
-                sceneRequest.completed += operation =>
-                {
-                    isDone = true;
-                    if (onComplete != null)
-                    {
-                        onComplete();
-                    }
-                };
+                asyncOperation = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
+                asyncOperation.completed += onSceneLoadCompleted;
             };
         }
 
         public SceneLoadRequest(AsyncOperation loadSceneAsyncOp)
         {
-            loadSceneAsyncOp.completed += operation =>
-            {
-                isDone = true;
-                if (onComplete != null)
-                {
-                    onComplete();
-                }
-            };
+            asyncOperation = loadSceneAsyncOp;
+            asyncOperation.completed += onSceneLoadCompleted;
         }
 
+        private void onSceneLoadCompleted(AsyncOperation obj)
+        {
+            if (onComplete != null)
+            {
+                onComplete.Invoke();
+            }
+        }
+        
         public override bool keepWaiting
         {
             get
             {
-                return !isDone;
+                if (asyncOperation == null)
+                    return true; //Edge case when we have to wait for the asset bundle to load (bundleLoadRequest)
+                else
+                    return !asyncOperation.isDone;
             }
         }
     }

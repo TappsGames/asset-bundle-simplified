@@ -4,7 +4,13 @@ using Object = UnityEngine.Object;
 
 namespace AssetBundleSimplified
 {
+#if UNITY_2017
+    public class AssetLoadRequestAwaiter<T> where T : Object
+#else
     public class AssetLoadRequestAwaiter<T> : INotifyCompletion where T : Object
+#endif
+    
+    
     {
         private readonly AssetLoadRequest<T> assetLoadRequest;
 
@@ -13,7 +19,10 @@ namespace AssetBundleSimplified
             this.assetLoadRequest = assetLoadRequest;
         }
 
-        public bool IsCompleted => assetLoadRequest.isAssetLoaded;
+        public bool IsCompleted()
+        {
+            return assetLoadRequest.isAssetLoaded;  
+        } 
 
         public AssetLoadRequest<T> GetResult()
         {

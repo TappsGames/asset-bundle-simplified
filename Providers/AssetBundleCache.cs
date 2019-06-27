@@ -60,7 +60,12 @@ namespace AssetBundleSimplified
         {
             if (!loadedBundles.ContainsKey(bundleName))
             {
+#if UNITY_2017
+                Debug.LogWarning(string.Format("{0} is already unloaded!", bundleName));
+#else
                 Debug.LogWarning($"{bundleName} is already unloaded!");
+#endif
+                
                 return;
             }
 
@@ -129,7 +134,12 @@ namespace AssetBundleSimplified
         {
             if (!referenceCounters.ContainsKey(bundleName))
             {
+#if UNITY_2017
+                Debug.LogError(string.Format("There isn't a reference counter for {0}", bundleName));
+#else
                 Debug.LogError($"There isn't a reference counter for {bundleName}");
+#endif
+                
                 return;
             }
 

@@ -36,7 +36,11 @@ namespace AssetBundleSimplified
         /// <param name="bundleName"></param>
         public void UnloadBundle(string bundleName)
         {
+#if UNITY_2017
+            Debug.Log(string.Format("Unloading bundle: {0}", bundleName));
+#else
             Debug.Log($"Unloading bundle: {bundleName}");
+#endif
             
             assetBundleCache.RemoveBundle(bundleName, false);
         }
@@ -138,8 +142,12 @@ namespace AssetBundleSimplified
             {
                 return assetBundle;
             }
-            
+#if UNITY_2017
+            Debug.Log(string.Format("Loading bundle: {0}", bundleName));
+#else
             Debug.Log($"Loading bundle: {bundleName}");
+#endif
+            
             assetBundle = LoadBundleFromFile(bundleName);
             assetBundleCache.AddBundle(bundleName, assetBundle, false);
             LoadBundleDependencies(bundleName);

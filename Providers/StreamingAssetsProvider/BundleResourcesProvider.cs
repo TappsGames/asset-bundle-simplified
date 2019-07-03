@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 namespace AssetBundleSimplified
 {
     public class BundleResourcesProvider : IBundleResourcesProvider
-    {   
+    {
         private static AssetBundleManifest bundlesManifest;
         private AssetBundleCache assetBundleCache;
         private DebugInterface debugInterface;
@@ -37,7 +37,7 @@ namespace AssetBundleSimplified
         public void UnloadBundle(string bundleName)
         {
             Debug.Log($"Unloading bundle: {bundleName}");
-            
+
             assetBundleCache.RemoveBundle(bundleName, false);
         }
 
@@ -77,7 +77,7 @@ namespace AssetBundleSimplified
         /// <param name="assetPath"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T LoadAsset<T>(string bundleName, string assetPath) where T: Object 
+        public T LoadAsset<T>(string bundleName, string assetPath) where T: Object
         {
             AssetBundle bundle = LoadBundle(bundleName);
             Object asset = bundle.LoadAsset<T>(assetPath);
@@ -89,7 +89,21 @@ namespace AssetBundleSimplified
             var bundleLoadRequest = LoadBundleAsync(bundleName);
             return new AssetLoadRequest<T>(bundleLoadRequest, assetKey);
         }
-        
+
+        /// <summary>
+        /// Load an asset that has sub assets of a specific type  on an asset bundle
+        /// </summary>
+        /// <param name="bundleName"></param>
+        /// <param name="assetPath"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T[] LoadAssetWithSubAssets<T>(string bundleName, string assetPath) where T : Object
+        {
+            AssetBundle bundle = LoadBundle(bundleName);
+            Object[] asset = bundle.LoadAssetWithSubAssets<T>(assetPath);
+            return asset as T[];
+        }
+
         /// <summary>
         /// Loads a scene
         /// </summary>
@@ -102,7 +116,7 @@ namespace AssetBundleSimplified
             var bundleRequest = LoadBundleAsync(bundleName);
             return new SceneLoadRequest(bundleRequest, sceneName, loadSceneMode);
         }
-        
+
         /// <summary>
         /// Loads a scene
         /// </summary>
@@ -113,11 +127,11 @@ namespace AssetBundleSimplified
         public AsyncOperation UnloadScene(string bundleName, string sceneName)
         {
             var asyncOp =  SceneManager.UnloadSceneAsync(sceneName);
-            
+
             asyncOp.completed += (operation) => {
                 UnloadBundle(bundleName);
             };
-            
+
             return asyncOp;
         }
 
@@ -138,16 +152,16 @@ namespace AssetBundleSimplified
             {
                 return assetBundle;
             }
-            
+
             Debug.Log($"Loading bundle: {bundleName}");
             assetBundle = LoadBundleFromFile(bundleName);
             assetBundleCache.AddBundle(bundleName, assetBundle, false);
             LoadBundleDependencies(bundleName);
             return assetBundle;
         }
-        
+
         /// <summary>
-        /// Asynchronously load an asset bundle and its dependencies 
+        /// Asynchronously load an asset bundle and its dependencies
         /// </summary>
         /// <param name="bundleName"></param>
         /// <returns></returns>
@@ -158,7 +172,7 @@ namespace AssetBundleSimplified
             {
                 return new BundleLoadRequest(loadedBundle);
             }
-            
+
             var request = LoadBundleFromFileAsync(bundleName, false);
             var dependencies = LoadBundleDependenciesAsync(bundleName);
             return new BundleLoadRequest(request, dependencies);
@@ -168,11 +182,11 @@ namespace AssetBundleSimplified
         {
             var bundlesDirectory = Path.Combine(Application.streamingAssetsPath, BundleResources.PATH_IN_STREAMING_ASSETS);
             var bundlePath = Path.Combine(bundlesDirectory, bundleName);
-            
+
             var assetBundle = AssetBundle.LoadFromFile(bundlePath);
             return assetBundle;
         }
-        
+
         private AssetBundleCreateRequest LoadBundleFromFileAsync(string bundleName, bool isDependency)
         {
             AssetBundleCreateRequest request;
@@ -180,7 +194,7 @@ namespace AssetBundleSimplified
             {
                 return request;
             }
-            
+
             var bundlesDirectory = Path.Combine(Application.streamingAssetsPath, BundleResources.PATH_IN_STREAMING_ASSETS);
             var bundlePath = Path.Combine(bundlesDirectory, bundleName);
 
@@ -205,7 +219,7 @@ namespace AssetBundleSimplified
                 {
                     continue;
                 }
-                
+
                 var request = LoadBundleFromFileAsync(bundleDependencyName, true);
                 bundleRequests.Add(request);
             }
@@ -216,30 +230,30 @@ namespace AssetBundleSimplified
         private void LoadBundleDependencies(string bundleName)
         {
             var bundleDependencies = bundlesManifest.GetAllDependencies(bundleName);
-            
+
             foreach (var bundleDependencyName in bundleDependencies)
             {
                 if (assetBundleCache.IsBundleLoaded(bundleDependencyName))
                 {
                     continue;
                 }
-                
+
                 var bundle = LoadBundleFromFile(bundleDependencyName);
                 assetBundleCache.AddBundle(bundleDependencyName, bundle, true);
             }
         }
-        
+
         private void UnloadBundleDependencies(string bundleName)
         {
             var bundleDependencies = bundlesManifest.GetAllDependencies(bundleName);
-            
+
             foreach (var bundleDependencyName in bundleDependencies)
             {
                 if (assetBundleCache.IsBundleLoaded(bundleDependencyName))
                 {
                     continue;
                 }
-                
+
                 assetBundleCache.RemoveBundle(bundleDependencyName, false);
             }
         }
@@ -249,7 +263,7 @@ namespace AssetBundleSimplified
             manifestBundle = LoadBundleFromFile("Bundles");
             bundlesManifest = manifestBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
             Debug.Assert(bundlesManifest != null, "Cant load asset bundle manifest!");
-            
+
             assetBundleCache = new AssetBundleCache(bundlesManifest);
             debugInterface = new DebugInterface(assetBundleCache);
             currentAsyncBundleLoadOperations = new Dictionary<string, AssetBundleCreateRequest>();

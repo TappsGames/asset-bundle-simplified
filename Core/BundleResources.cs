@@ -29,7 +29,7 @@ namespace AssetBundleSimplified
         {
             provider.UnloadBundle(bundleName);
         }
-        
+
         public static void LoadBundle(string bundleName)
         {
             provider.LoadBundle(bundleName);
@@ -49,17 +49,22 @@ namespace AssetBundleSimplified
         {
             return provider.LoadAsset<T>(bundleName, assetPath);
         }
-        
+
         public static AssetLoadRequest<T> LoadAssetAsync<T>(string assetBundle, string assetName) where T: Object
         {
             return provider.LoadAssetAsync<T>(assetBundle, assetName);
+        }
+
+        public static T[] LoadAssetWithSubAssets<T>(string bundleName, string assetName) where T : Object
+        {
+            return provider.LoadAssetWithSubAssets<T>(bundleName, assetName);
         }
 
         public static SceneLoadRequest LoadScene(string bundleName, string sceneName, LoadSceneMode loadMode)
         {
             return provider.LoadScene(bundleName, sceneName, loadMode);
         }
-        
+
         public static AsyncOperation UnloadScene(string bundleName, string sceneName)
         {
             return provider.UnloadScene(bundleName, sceneName);
@@ -70,7 +75,7 @@ namespace AssetBundleSimplified
             return provider.GetDebugInterface();
         }
 
-        
+
         private static IBundleResourcesProvider GetProvider()
         {
 #if UNITY_EDITOR

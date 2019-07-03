@@ -14,7 +14,7 @@ namespace AssetBundleSimplified
     public class EditorBundleResourcesProvider : IBundleResourcesProvider
     {
         public LoadSceneParameters SceneLoadParams = new LoadSceneParameters();
-        
+
         public void UnloadAll()
         {
         }
@@ -69,7 +69,7 @@ namespace AssetBundleSimplified
             {
                 assetPath = assetPath.Substring(0, prefabIndex);
             }
-            
+
             var path = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(bundleName, assetPath);
             Object asset = AssetDatabase.LoadAssetAtPath<T>(path[0]);
 
@@ -80,6 +80,26 @@ namespace AssetBundleSimplified
         {
             var obj = LoadAsset<T>(bundleName, assetKey);
             return new AssetLoadRequest<T>(obj);
+        }
+
+        public T[] LoadAssetWithSubAssets<T>(string bundleName, string assetPath) where T : Object
+        {
+            var prefabIndex = assetPath.IndexOf(".prefab", StringComparison.InvariantCultureIgnoreCase);
+            if (prefabIndex >= 0)
+            {
+                assetPath = assetPath.Substring(0, prefabIndex);
+            }
+
+            var path = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(bundleName, assetPath);
+            Object[] objects = AssetDatabase.LoadAllAssetsAtPath(path[0]);
+
+            var assets = new T[objects.Length - 1];
+            for (int i = 1; i < objects.Length; i++)
+            {
+                assets[i - 1] = objects[i] as T;
+            }
+
+            return assets;
         }
 
         public SceneLoadRequest LoadScene(string bundleName, string sceneName, LoadSceneMode loadSceneMode)

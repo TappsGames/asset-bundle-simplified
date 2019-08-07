@@ -10,6 +10,7 @@ namespace AssetBundleSimplified
         void UnloadBundle(string bundleName);
         bool IsBundleLoaded(string bundleName);
         AssetBundle LoadBundle(string bundleName);
+        BundleLoadRequest LoadBundleAsync(string bundleName);
         T LoadAsset<T>(string bundleName, string assetPath) where T: Object;
         T[] LoadAllAssets<T>(string bundleName) where T : Object;
         AssetLoadRequest<T> LoadAssetAsync<T>(string bundleName, string assetKey) where T: Object;

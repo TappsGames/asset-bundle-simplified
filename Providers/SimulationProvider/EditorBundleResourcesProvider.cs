@@ -33,6 +33,11 @@ namespace AssetBundleSimplified
             return null;
         }
 
+        public BundleLoadRequest LoadBundleAsync(string bundleName)
+        {
+            return new BundleLoadRequest(LoadBundle(bundleName));
+        }
+
         public T[] LoadAllAssets<T>(string bundleName) where T : Object
         {
             var assetKey = bundleName + typeof(T).FullName;

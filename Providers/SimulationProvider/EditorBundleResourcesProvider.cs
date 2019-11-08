@@ -14,7 +14,7 @@ namespace AssetBundleSimplified
     public class EditorBundleResourcesProvider : IBundleResourcesProvider
     {
         public LoadSceneParameters SceneLoadParams = new LoadSceneParameters();
-        
+
         public void UnloadAll()
         {
         }
@@ -74,9 +74,14 @@ namespace AssetBundleSimplified
             {
                 assetPath = assetPath.Substring(0, prefabIndex);
             }
-            
-            var path = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(bundleName, assetPath);
-            Object asset = AssetDatabase.LoadAssetAtPath<T>(path[0]);
+
+            string[] paths = AssetDatabase.GetAssetPathsFromAssetBundleAndAssetName(bundleName, assetPath);
+            if (paths.Length == 0)
+            {
+                return null;
+            }
+
+            Object asset = AssetDatabase.LoadAssetAtPath<T>(paths[0]);
 
             return asset as T;
         }

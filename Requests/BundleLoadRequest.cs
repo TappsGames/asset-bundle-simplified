@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace AssetBundleSimplified
 {
     public class BundleLoadRequest : CustomYieldInstruction
     {
-        
         public AssetBundle Bundle;
         private bool isMainBundleLoaded;
         private Queue<AsyncOperation> dependenciesQueue;
@@ -58,7 +58,26 @@ namespace AssetBundleSimplified
                 };
             }
         }
-        
+
+        public BundleLoadRequest(IBundleDownloadRequest downloadRequest)
+        {
+            dependenciesQueue = new Queue<AsyncOperation>();
+            
+            downloadRequest.Completed += () =>
+            {
+                isMainBundleLoaded = true;
+                Bundle = downloadRequest.Bundle;
+                
+                if (IsLoaded())
+                {
+                    if (onCompleteCallback != null)
+                    {
+                        onCompleteCallback.Invoke(Bundle);
+                    }
+                }
+            };            
+        }
+
         public override bool keepWaiting
         {
             get

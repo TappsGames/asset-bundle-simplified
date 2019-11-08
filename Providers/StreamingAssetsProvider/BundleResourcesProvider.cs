@@ -14,6 +14,9 @@ namespace AssetBundleSimplified
         private DebugInterface debugInterface;
         private AssetBundle manifestBundle;
         private Dictionary<string, AssetBundleCreateRequest> currentAsyncBundleLoadOperations;
+        private Dictionary<string, BundleLoadRequest> currentDLCDownloadRequests;
+
+        private IRemoteBundleProvider remoteProvider;
 
         public BundleResourcesProvider()
         {
@@ -126,6 +129,11 @@ namespace AssetBundleSimplified
             return debugInterface;
         }
 
+        public void SetRemoteProvider(IRemoteBundleProvider remoteBundleProvider)
+        {
+            remoteProvider = remoteBundleProvider;
+        }
+
         /// <summary>
         /// Load an asset bundle and its dependencies
         /// </summary>
@@ -158,6 +166,29 @@ namespace AssetBundleSimplified
             {
                 return new BundleLoadRequest(loadedBundle);
             }
+
+            if (remoteProvider != null && remoteProvider.IsRemoteBundle(bundleName))
+            {
+                BundleLoadRequest bundleLoadRequest;
+                
+                if (currentDLCDownloadRequests.TryGetValue(bundleName, out bundleLoadRequest))
+                {
+                    return bundleLoadRequest;
+                }
+                
+                var downloadRequest = remoteProvider.DownloadBundle(bundleName);
+                bundleLoadRequest = new BundleLoadRequest(downloadRequest);
+                    
+                bundleLoadRequest.OnComplete += bundle =>
+                {
+                    currentDLCDownloadRequests.Remove(bundleName);
+                    assetBundleCache.AddBundle(bundleName, bundle, false);
+                };
+                
+                currentDLCDownloadRequests.Add(bundleName, bundleLoadRequest);
+
+                return bundleLoadRequest;
+            };
             
             var request = LoadBundleFromFileAsync(bundleName, false);
             var dependencies = LoadBundleDependenciesAsync(bundleName);
@@ -253,6 +284,7 @@ namespace AssetBundleSimplified
             assetBundleCache = new AssetBundleCache(bundlesManifest);
             debugInterface = new DebugInterface(assetBundleCache);
             currentAsyncBundleLoadOperations = new Dictionary<string, AssetBundleCreateRequest>();
+            currentDLCDownloadRequests = new Dictionary<string, BundleLoadRequest>();
         }
     }
 }

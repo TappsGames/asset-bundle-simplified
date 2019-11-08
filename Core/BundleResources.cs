@@ -35,6 +35,11 @@ namespace AssetBundleSimplified
             provider.LoadBundle(bundleName);
         }
 
+        public static BundleLoadRequest LoadBundleAsync(string bundleName)
+        {
+            return provider.LoadBundleAsync(bundleName);
+        }
+        
         public static T[] LoadAllAssets<T>(string bundleName) where T : Object
         {
             return provider.LoadAllAssets<T>(bundleName);
@@ -70,7 +75,11 @@ namespace AssetBundleSimplified
             return provider.GetDebugInterface();
         }
 
-        
+        public static void SetRemoteProvider(IRemoteBundleProvider remoteBundleProvider)
+        {
+            provider.SetRemoteProvider(remoteBundleProvider);
+        }
+
         private static IBundleResourcesProvider GetProvider()
         {
 #if UNITY_EDITOR

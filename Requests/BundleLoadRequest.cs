@@ -25,11 +25,7 @@ namespace AssetBundleSimplified
                     onCompleteCallback += value;
                 }
             }
-
-            remove
-            {
-                onCompleteCallback -= value;
-            }
+            remove => onCompleteCallback -= value;
         }
 
 
@@ -48,7 +44,7 @@ namespace AssetBundleSimplified
                 Bundle = createRequest.assetBundle;
                 UpdateDependencies();
             };
-            
+
             dependenciesQueue = new Queue<AsyncOperation>(dependencies);
             foreach (var asyncOperation in dependenciesQueue)
             {
@@ -62,20 +58,17 @@ namespace AssetBundleSimplified
         public BundleLoadRequest(IBundleDownloadRequest downloadRequest)
         {
             dependenciesQueue = new Queue<AsyncOperation>();
-            
+
             downloadRequest.Completed += () =>
             {
                 isMainBundleLoaded = true;
                 Bundle = downloadRequest.Bundle;
-                
+
                 if (IsLoaded())
                 {
-                    if (onCompleteCallback != null)
-                    {
-                        onCompleteCallback.Invoke(Bundle);
-                    }
+                    onCompleteCallback?.Invoke(Bundle);
                 }
-            };            
+            };
         }
 
         public override bool keepWaiting
@@ -100,7 +93,7 @@ namespace AssetBundleSimplified
                     break;
                 }
             }
-            
+
             if (IsLoaded())
             {
                 if (onCompleteCallback != null)

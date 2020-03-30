@@ -33,11 +33,7 @@ namespace AssetBundleSimplified
                     OnCompleteCallback += value;
                 }
             }
-
-            remove
-            {
-                OnCompleteCallback -= value;
-            }
+            remove => OnCompleteCallback -= value;
         }
 
         public AssetLoadRequest(T[] assets)
@@ -76,14 +72,7 @@ namespace AssetBundleSimplified
             };
         }
 
-        public override bool keepWaiting
-        {
-            get
-            {
-                var isLoaded = IsLoaded();
-                return !isLoaded;
-            }
-        }
+        public override bool keepWaiting => !IsLoaded();
 
         public AssetLoadRequestAwaiter<T> GetAwaiter()
         {

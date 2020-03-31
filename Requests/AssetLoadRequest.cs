@@ -33,11 +33,7 @@ namespace AssetBundleSimplified
                     OnCompleteCallback += value;
                 }
             }
-
-            remove
-            {
-                OnCompleteCallback -= value;
-            }
+            remove => OnCompleteCallback -= value;
         }
 
         public AssetLoadRequest(T[] assets)
@@ -61,7 +57,13 @@ namespace AssetBundleSimplified
         {
             createRequest.OnComplete += bundle =>
             {
-                var request = bundle.LoadAllAssetsAsync<T>();
+                if (bundle == null)
+                {
+                    OnCompleteCallback?.Invoke(Asset);
+                    return;
+                }
+
+                AssetBundleRequest request = bundle.LoadAllAssetsAsync<T>();
                 request.completed += LoadAssets;
             };
         }
@@ -70,20 +72,18 @@ namespace AssetBundleSimplified
         {
             createRequest.OnComplete += bundle =>
             {
-                var request = bundle.LoadAssetAsync<T>(assetKey);
+                if (bundle == null)
+                {
+                    OnCompleteCallback?.Invoke(Asset);
+                    return;
+                }
 
+                AssetBundleRequest request = bundle.LoadAssetAsync<T>(assetKey);
                 request.completed += LoadAssets;
             };
         }
 
-        public override bool keepWaiting
-        {
-            get
-            {
-                var isLoaded = IsLoaded();
-                return !isLoaded;
-            }
-        }
+        public override bool keepWaiting => !IsLoaded();
 
         public AssetLoadRequestAwaiter<T> GetAwaiter()
         {

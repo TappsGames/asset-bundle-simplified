@@ -57,7 +57,13 @@ namespace AssetBundleSimplified
         {
             createRequest.OnComplete += bundle =>
             {
-                var request = bundle.LoadAllAssetsAsync<T>();
+                if (bundle == null)
+                {
+                    OnCompleteCallback?.Invoke(Asset);
+                    return;
+                }
+
+                AssetBundleRequest request = bundle.LoadAllAssetsAsync<T>();
                 request.completed += LoadAssets;
             };
         }
@@ -66,8 +72,13 @@ namespace AssetBundleSimplified
         {
             createRequest.OnComplete += bundle =>
             {
-                var request = bundle.LoadAssetAsync<T>(assetKey);
+                if (bundle == null)
+                {
+                    OnCompleteCallback?.Invoke(Asset);
+                    return;
+                }
 
+                AssetBundleRequest request = bundle.LoadAssetAsync<T>(assetKey);
                 request.completed += LoadAssets;
             };
         }

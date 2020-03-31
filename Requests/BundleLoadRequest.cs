@@ -96,10 +96,7 @@ namespace AssetBundleSimplified
 
             if (IsLoaded())
             {
-                if (onCompleteCallback != null)
-                {
-                    onCompleteCallback.Invoke(Bundle);
-                }
+                onCompleteCallback?.Invoke(Bundle);
             }
         }
 

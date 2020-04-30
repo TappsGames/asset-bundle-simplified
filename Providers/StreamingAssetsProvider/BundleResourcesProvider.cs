@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using AsyncOperation = UnityEngine.AsyncOperation;
 using Object = UnityEngine.Object;
 
 namespace AssetBundleSimplified
@@ -79,14 +81,14 @@ namespace AssetBundleSimplified
         /// <param name="assetPath"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T LoadAsset<T>(string bundleName, string assetPath) where T: Object
+        public T LoadAsset<T>(string bundleName, string assetPath) where T : Object
         {
             AssetBundle bundle = LoadBundle(bundleName);
             Object asset = bundle.LoadAsset<T>(assetPath);
             return asset as T;
         }
 
-        public AssetLoadRequest<T> LoadAssetAsync<T>(string bundleName, string assetKey) where T: Object
+        public AssetLoadRequest<T> LoadAssetAsync<T>(string bundleName, string assetKey) where T : Object
         {
             var bundleLoadRequest = LoadBundleAsync(bundleName);
             return new AssetLoadRequest<T>(bundleLoadRequest, assetKey);
@@ -114,11 +116,16 @@ namespace AssetBundleSimplified
         /// <returns></returns>
         public AsyncOperation UnloadScene(string bundleName, string sceneName)
         {
-            var asyncOp =  SceneManager.UnloadSceneAsync(sceneName);
+            AsyncOperation asyncOp = SceneManager.UnloadSceneAsync(sceneName);
 
-            asyncOp.completed += (operation) => {
-                UnloadBundle(bundleName);
-            };
+            if (asyncOp == null)
+            {
+                throw new InvalidAsynchronousStateException(
+                    $"Failed to unload scene: '{sceneName}'. "
+                    + "The scene was either not fully loaded or it was the last remaining scene");
+            }
+
+            asyncOp.completed += (operation) => { UnloadBundle(bundleName); };
 
             return asyncOp;
         }
@@ -175,7 +182,7 @@ namespace AssetBundleSimplified
                     return bundleLoadRequest;
                 }
 
-                var downloadRequest = remoteProvider.DownloadBundle(bundleName);
+                IBundleDownloadRequest downloadRequest = remoteProvider.DownloadBundle(bundleName);
                 bundleLoadRequest = new BundleLoadRequest(downloadRequest);
 
                 bundleLoadRequest.OnComplete += bundle =>
@@ -187,7 +194,7 @@ namespace AssetBundleSimplified
                 currentDLCDownloadRequests.Add(bundleName, bundleLoadRequest);
 
                 return bundleLoadRequest;
-            };
+            }
 
             var request = LoadBundleFromFileAsync(bundleName, false);
             var dependencies = LoadBundleDependenciesAsync(bundleName);
@@ -196,7 +203,8 @@ namespace AssetBundleSimplified
 
         private AssetBundle LoadBundleFromFile(string bundleName)
         {
-            var bundlesDirectory = Path.Combine(Application.streamingAssetsPath, BundleResources.PATH_IN_STREAMING_ASSETS);
+            var bundlesDirectory =
+                Path.Combine(Application.streamingAssetsPath, BundleResources.PATH_IN_STREAMING_ASSETS);
             var bundlePath = Path.Combine(bundlesDirectory, bundleName);
 
             var assetBundle = AssetBundle.LoadFromFile(bundlePath);
@@ -211,7 +219,8 @@ namespace AssetBundleSimplified
                 return request;
             }
 
-            var bundlesDirectory = Path.Combine(Application.streamingAssetsPath, BundleResources.PATH_IN_STREAMING_ASSETS);
+            var bundlesDirectory =
+                Path.Combine(Application.streamingAssetsPath, BundleResources.PATH_IN_STREAMING_ASSETS);
             var bundlePath = Path.Combine(bundlesDirectory, bundleName);
 
             request = AssetBundle.LoadFromFileAsync(bundlePath);

@@ -10,7 +10,7 @@ namespace AssetBundleSimplified
         {
             add
             {
-                if (asyncOperation.isDone)
+                if (asyncOperation != null && asyncOperation.isDone)
                 {
                     value();
                     return;
@@ -48,7 +48,7 @@ namespace AssetBundleSimplified
                 onComplete.Invoke();
             }
         }
-        
+
         public override bool keepWaiting
         {
             get

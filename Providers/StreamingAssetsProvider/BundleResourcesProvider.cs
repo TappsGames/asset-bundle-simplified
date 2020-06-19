@@ -188,7 +188,11 @@ namespace AssetBundleSimplified
                 bundleLoadRequest.OnComplete += bundle =>
                 {
                     currentDLCDownloadRequests.Remove(bundleName);
-                    assetBundleCache.AddBundle(bundleName, bundle, false);
+                    
+                    if (bundle != null)
+                    {
+                        assetBundleCache.AddBundle(bundleName, bundle, false);
+                    }
                 };
 
                 currentDLCDownloadRequests.Add(bundleName, bundleLoadRequest);

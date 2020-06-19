@@ -34,6 +34,8 @@ namespace AssetBundleSimplified
             Bundle = assetBundle;
             isMainBundleLoaded = true;
             dependenciesQueue = new Queue<AsyncOperation>();
+            
+            onCompleteCallback?.Invoke(Bundle);
         }
 
         public BundleLoadRequest(AssetBundleCreateRequest createRequest, List<AsyncOperation> dependencies)
